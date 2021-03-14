@@ -30,8 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
  * by adding support for textures/animation, 
  * collision polygons, movement, world boundaries, and camera scrolling. 
  * Most game objects should extend this class; lists of extensions can be retrieved by stage and class name.
- * @see #Actor
- * @author Lee Stemkoski
  */
 public class BaseActor extends Group
 {
@@ -485,6 +483,30 @@ public class BaseActor extends Group
 
         this.moveBy( mtv.normal.x * mtv.depth, mtv.normal.y * mtv.depth );
         return mtv.normal;
+    }
+
+    /**
+     *  Determine if this BaseActor is near other BaseActor (according to collision polygons).
+     *  @param distance amount (pixels) by which to enlarge collision polygon width and height
+     *  @param other BaseActor to check if nearby
+     *  @return true if collision polygons of this (enlarged) and other BaseActor overlap
+     *  @see #setBoundaryRectangle
+     *  @see #setBoundaryPolygon
+     */
+    public boolean isWithinDistance(float distance, BaseActor other)
+    {
+        Polygon poly1 = this.getBoundaryPolygon();
+        float scaleX = (this.getWidth() + 2 * distance) / this.getWidth();
+        float scaleY = (this.getHeight() + 2 * distance) / this.getHeight();
+        poly1.setScale(scaleX, scaleY);
+
+        Polygon poly2 = other.getBoundaryPolygon();
+
+        // initial test to improve performance
+        if ( !poly1.getBoundingRectangle().overlaps(poly2.getBoundingRectangle()) )
+            return false;
+
+        return Intersector.overlapConvexPolygons( poly1, poly2 );
     }
 
     /**

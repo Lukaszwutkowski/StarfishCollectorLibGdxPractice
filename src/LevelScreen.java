@@ -14,6 +14,7 @@ public class LevelScreen extends BaseScreen{
     private Turtle turtle;
     private boolean win;
     private Label starfishLabel;
+    private DialogBox dialogBox;
 
     @Override
     public void initialize()
@@ -50,7 +51,6 @@ public class LevelScreen extends BaseScreen{
         new Rock(400,580, mainStage);
         new Rock(500,400, mainStage);
         new Rock(380,120, mainStage);
-        new Rock(500,400, mainStage);
         new Rock(600,350, mainStage);
         new Rock(740,570, mainStage);
         new Rock(720,200, mainStage);
@@ -60,7 +60,7 @@ public class LevelScreen extends BaseScreen{
         new Rock(40,600, mainStage);
         new Rock(159,500, mainStage);
         new Rock(60,330, mainStage);
-        new Rock(70,400, mainStage);
+        // new Rock(70,400, mainStage);
         new Rock(200,150, mainStage);
         new Rock(100,300, mainStage);
         new Rock(300,350, mainStage);
@@ -72,6 +72,12 @@ public class LevelScreen extends BaseScreen{
         new Shark(150, 800, mainStage);
 
         turtle = new Turtle(20,20, mainStage);
+
+        Sign sign1 = new Sign(20,400, mainStage);
+        sign1.setText("West Starfish Bay");
+
+        Sign sign2 = new Sign(600,300, mainStage);
+        sign2.setText("East Starfish Bay");
 
         win = false;
 
@@ -111,6 +117,17 @@ public class LevelScreen extends BaseScreen{
         uiTable.add(starfishLabel).top();
         uiTable.add().expandX().expandY();
         uiTable.add(restartButton).top();
+
+        dialogBox = new DialogBox(0,0, uiStage);
+        dialogBox.setBackgroundColor( Color.TAN );
+        dialogBox.setFontColor( Color.BROWN );
+        dialogBox.setDialogSize(600, 100);
+        dialogBox.setFontScale(0.80f);
+        dialogBox.alignCenter();
+        dialogBox.setVisible(false);
+
+        uiTable.row();
+        uiTable.add(dialogBox).colspan(3);
 
     }
 
@@ -160,5 +177,27 @@ public class LevelScreen extends BaseScreen{
         }
 
         starfishLabel.setText("Starfish Left: " + BaseActor.count(mainStage, "Starfish"));
+
+        for ( BaseActor signActor : BaseActor.getList(mainStage, "Sign") )
+        {
+            Sign sign = (Sign)signActor;
+
+            turtle.preventOverlap(sign);
+            boolean nearby = turtle.isWithinDistance(4, sign);
+
+            if ( nearby && !sign.isViewing() )
+            {
+                dialogBox.setText( sign.getText() );
+                dialogBox.setVisible( true );
+                sign.setViewing( true );
+            }
+
+            if (sign.isViewing() && !nearby)
+            {
+                dialogBox.setText( " " );
+                dialogBox.setVisible( false );
+                sign.setViewing( false );
+            }
+        }
     }
 }
