@@ -25,8 +25,9 @@ public class MenuScreen extends BaseScreen {
         */
 
         TextButton startButton = new TextButton("Start", BaseGame.textButtonStyle);
-        startButton.setPosition(150, 150);
-        uiStage.addActor(startButton);
+        // TODO --> method used before which set Position of startButton
+        // startButton.setPosition(150, 150);
+        // uiStage.addActor(startButton);
 
         startButton.addListener(
                 (Event e) ->
@@ -41,8 +42,9 @@ public class MenuScreen extends BaseScreen {
         );
 
         TextButton quitButton = new TextButton("Quit", BaseGame.textButtonStyle);
-        quitButton.setPosition(500, 150);
-        uiStage.addActor(quitButton);
+        // TODO --> method used before which set Position of quitButton
+        // quitButton.setPosition(500, 150);
+        // uiStage.addActor(quitButton);
 
         quitButton.addListener(
                 (Event e) ->
@@ -55,6 +57,11 @@ public class MenuScreen extends BaseScreen {
                     return false;
                 }
         );
+
+        uiTable.add(title).colspan(2);
+        uiTable.row();
+        uiTable.add(startButton);
+        uiTable.add(quitButton);
     }
 
     public boolean keyDown(int keyCode) {

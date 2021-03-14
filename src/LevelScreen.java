@@ -75,10 +75,13 @@ public class LevelScreen extends BaseScreen{
 
         win = false;
 
+        // TODO --> User interface code
+
         starfishLabel = new Label("Starfish Left:", BaseGame.labelStyle);
         starfishLabel.setColor(Color.CYAN);
-        starfishLabel.setPosition(20, 520);
-        uiStage.addActor(starfishLabel);
+        // TODO --> method used before which set Position of starfishLabel
+        // starfishLabel.setPosition(20, 520);
+        // uiStage.addActor(starfishLabel);
 
         Button.ButtonStyle buttonStyle = new Button.ButtonStyle();
 
@@ -88,8 +91,9 @@ public class LevelScreen extends BaseScreen{
 
         Button restartButton = new Button(buttonStyle);
         restartButton.setColor(Color.CYAN);
-        restartButton.setPosition(720, 520);
-        uiStage.addActor(restartButton);
+        // TODO --> method used before which set Position of restartButton
+        // restartButton.setPosition(720, 520);
+        // uiStage.addActor(restartButton);
 
         restartButton.addListener(
                 (Event e) ->
@@ -102,6 +106,12 @@ public class LevelScreen extends BaseScreen{
                     return false;
                 }
         );
+
+        uiTable.pad(10);
+        uiTable.add(starfishLabel).top();
+        uiTable.add().expandX().expandY();
+        uiTable.add(restartButton).top();
+
     }
 
     @Override
