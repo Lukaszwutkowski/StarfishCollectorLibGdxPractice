@@ -36,7 +36,9 @@ public class MenuScreen extends BaseScreen {
                             !((InputEvent) e).getType().equals(InputEvent.Type.touchDown))
                         return false;
 
+                    // TODO --> ADDED CUTSCENE SCREEN (StoryScreen) to start after pressing start button
                     StarfishGame.setActiveScreen(new StoryScreen());
+                    // StarfishGame.setActiveScreen(new LevelScreen());
                     return false;
                 }
         );

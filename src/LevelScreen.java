@@ -1,20 +1,36 @@
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl.audio.Ogg;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+
+
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 
 public class LevelScreen extends BaseScreen{
 
     private Turtle turtle;
     private boolean win;
     private Label starfishLabel;
+
+    // TODO --> for scenes
     private DialogBox dialogBox;
+
+    // TODO --> for music and sounds
+    private float audioVolume;
+    private Sound waterDrop;
+    private Music instrumental;
+    private Music oceanSurf;
+
+    // TODO --> shark sound
+    private Sound eaten;
+    private Sound burp;
 
     @Override
     public void initialize()
@@ -104,18 +120,55 @@ public class LevelScreen extends BaseScreen{
         restartButton.addListener(
                 (Event e) ->
                 {
-                    if (!(e instanceof InputEvent) ||
+                    // TODO --> code before added music and sound
+                    /* if (!(e instanceof InputEvent) ||
                     !((InputEvent)e).getType().equals(InputEvent.Type.touchDown))
                         return false;
 
                     StarfishGame.setActiveScreen(new LevelScreen());
                     return false;
+
+                     */
+
+                    if (!isTouchDownEvent(e)){
+                        return false;
+                    }
+
+                    instrumental.dispose();
+                    oceanSurf.dispose();
+
+                    StarfishGame.setActiveScreen(new LevelScreen());
+                    return true;
+                }
+        );
+
+        Button.ButtonStyle buttonStyle2 = new Button.ButtonStyle();
+
+        Texture buttonTex2 = new Texture(Gdx.files.internal("assets/audio.png"));
+        TextureRegion buttonRegion2 = new TextureRegion(buttonTex2);
+        buttonStyle2.up = new TextureRegionDrawable(buttonRegion2);
+
+        Button muteButton = new Button(buttonStyle2);
+        muteButton.setColor(Color.CYAN);
+
+        muteButton.addListener(
+                (Event e) -> {
+                    if (!isTouchDownEvent(e)) {
+                        return false;
+                    }
+
+                    audioVolume = 1 - audioVolume;
+                    instrumental.setVolume(audioVolume);
+                    oceanSurf.setVolume(audioVolume);
+
+                    return true;
                 }
         );
 
         uiTable.pad(10);
         uiTable.add(starfishLabel).top();
         uiTable.add().expandX().expandY();
+        uiTable.add(muteButton).top();
         uiTable.add(restartButton).top();
 
         dialogBox = new DialogBox(0,0, uiStage);
@@ -127,7 +180,22 @@ public class LevelScreen extends BaseScreen{
         dialogBox.setVisible(false);
 
         uiTable.row();
-        uiTable.add(dialogBox).colspan(3);
+        uiTable.add(dialogBox).colspan(4);
+
+        waterDrop    = Gdx.audio.newSound(Gdx.files.internal("assets/Water_Drop.ogg"));
+        eaten = Gdx.audio.newSound(Gdx.files.internal("assets/eating.ogg"));
+        burp = Gdx.audio.newSound(Gdx.files.internal("assets/burp.ogg"));
+        instrumental = Gdx.audio.newMusic(Gdx.files.internal("assets/Master_of_the_Feast.ogg"));
+        oceanSurf    = Gdx.audio.newMusic(Gdx.files.internal("assets/Ocean_Waves.ogg"));
+
+        audioVolume = 1.00f;
+        instrumental.setLooping(true);
+        instrumental.setVolume(audioVolume);
+        instrumental.play();
+        oceanSurf.setLooping(true);
+        oceanSurf.setVolume(audioVolume);
+        oceanSurf.play();
+
 
     }
 
@@ -143,6 +211,7 @@ public class LevelScreen extends BaseScreen{
             if ( turtle.overlaps(starfish) && !starfish.collected )
             {
                 starfish.collected = true;
+                waterDrop.play(audioVolume);
                 starfish.clearActions();
                 starfish.addAction( Actions.fadeOut(1) );
                 starfish.addAction( Actions.after( Actions.removeActor() ) );
@@ -157,11 +226,22 @@ public class LevelScreen extends BaseScreen{
             Shark shark = (Shark)sharkActor;
             if ( turtle.overlaps(shark))
             {
-                BaseActor GameOverMessage = new BaseActor(0, 0, uiStage);
-                GameOverMessage.loadTexture("assets/game-over.png");
-                GameOverMessage.centerAtPosition(400, 300);
+                long t= System.currentTimeMillis();
+                long end = t+2000;
+
+                eaten.play(audioVolume);
                 turtle.addAction( Actions.fadeOut(1));
+                burp.play(audioVolume);
+
+                while(System.currentTimeMillis() < end) {
+                    // do something
+                    BaseActor GameOverMessage = new BaseActor(0, 0, uiStage);
+                    GameOverMessage.loadTexture("assets/game-over.png");
+                    GameOverMessage.centerAtPosition(400, 300);
+                }
+
                 turtle.addAction( Actions.after(Actions.removeActor()));
+
             }
         }
 
